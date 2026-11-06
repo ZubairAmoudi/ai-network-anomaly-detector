@@ -25,3 +25,9 @@ Project/
 ├── evaluate.py              # Model performance evaluation and confusion matrix script
 ├── requirements.txt         # Python dependencies
 └── README.md                # Project documentation
+
+
+👨‍💻 Author
+Engineer Zubair
+
+Combining Engineering, Network Architecture, and Artificial Intelligence.
