@@ -1,0 +1,71 @@
+{
+  "dataset_size": 6000,
+  "train_size": 4500,
+  "test_size": 1500,
+  "anomaly_ratio": 0.18,
+  "feature_names": [
+    "Port",
+    "Protocol_Code",
+    "TCP_Flag_Code",
+    "Packet_Size",
+    "Flow_Duration",
+    "Packet_Count",
+    "Packets_Per_Sec",
+    "Bytes_Per_Sec",
+    "Is_Well_Known_Port",
+    "Is_External_Source"
+  ],
+  "feature_importances": {
+    "Port": 0.0562,
+    "Protocol_Code": 0.004,
+    "TCP_Flag_Code": 0.1331,
+    "Packet_Size": 0.1024,
+    "Flow_Duration": 0.0656,
+    "Packet_Count": 0.2901,
+    "Packets_Per_Sec": 0.1894,
+    "Bytes_Per_Sec": 0.1174,
+    "Is_Well_Known_Port": 0.0288,
+    "Is_External_Source": 0.013
+  },
+  "random_forest": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "roc_auc": 1.0,
+    "confusion_matrix": [
+      [
+        1230,
+        0
+      ],
+      [
+        0,
+        270
+      ]
+    ]
+  },
+  "isolation_forest": {
+    "accuracy": 0.956,
+    "precision": 0.8643,
+    "recall": 0.8963,
+    "f1_score": 0.88,
+    "roc_auc": 0.9901,
+    "confusion_matrix": [
+      [
+        1192,
+        38
+      ],
+      [
+        28,
+        242
+      ]
+    ]
+  },
+  "hybrid_ensemble": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "roc_auc": 1.0
+  }
+}
