@@ -94,7 +94,7 @@ def compute_overall_threat_level(df_pred: pd.DataFrame) -> tuple[str, str, float
 def init_session_state(bundle: dict):
     """Initialize live traffic buffer in Streamlit session state."""
     if "traffic_buffer" not in st.session_state:
-        data_file = os.path.join("data", "network_traffic.csv")
+        data_file = os.path.join("data", "processed", "network_traffic_cleaned.csv")
         if os.path.exists(data_file):
             base_df = pd.read_csv(data_file).tail(600).reset_index(drop=True)
         else:
@@ -181,7 +181,7 @@ def main():
         st.divider()
         if st.button("🔄 Reset & Retrain Models", width="stretch"):
             with st.spinner("Regenerating dataset and retraining ML models..."):
-                save_dataset("data/network_traffic.csv", n_samples=6000)
+                save_dataset("data/raw/network_traffic.csv", n_samples=6000)
                 train_and_save_models()
                 st.cache_resource.clear()
                 del st.session_state["traffic_buffer"]

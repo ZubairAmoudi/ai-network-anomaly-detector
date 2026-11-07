@@ -27,7 +27,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from data_generator import generate_network_traffic, save_dataset
+from src.preprocessing import load_and_clean_data
 
+
+RAW_DATA_PATH = "data/raw/network_traffic.csv"
+PROCESSED_DATA_DIR = "data/processed"
+CLEAN_DATA_PATH = os.path.join(PROCESSED_DATA_DIR, "network_traffic_cleaned.csv")
+# Target columns: never coerced to numeric during cleaning.
+LABEL_COLUMNS = ["Label", "Attack_Type"]
+
+# Train/test split parameters, shared with evaluate.py so that evaluation
+# reproduces exactly the held-out test rows used during training.
+TEST_SIZE = 0.25
+SPLIT_RANDOM_STATE = 42
 
 PROTOCOL_MAP = {"TCP": 0, "UDP": 1, "ICMP": 2}
 FLAG_MAP = {"NONE": 0, "ACK": 1, "PSH-ACK": 2, "SYN-ACK": 3, "SYN": 4, "RST": 5, "FIN": 6}
@@ -85,17 +97,38 @@ def extract_features(df: pd.DataFrame) -> pd.DataFrame:
     return feat[FEATURE_COLUMNS]
 
 
+def holdout_indices(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """Return (train_idx, test_idx) positions matching the training split.
+
+    Uses the same size, seed and stratification as ``train_and_save_models``,
+    so for the same cleaned dataset the test positions are identical.
+    """
+    y_binary = (df["Label"] == "Anomaly").to_numpy(dtype=int)
+    train_idx, test_idx = train_test_split(
+        np.arange(len(df)),
+        test_size=TEST_SIZE,
+        random_state=SPLIT_RANDOM_STATE,
+        stratify=y_binary,
+    )
+    return train_idx, test_idx
+
+
 def train_and_save_models(
-    data_path: str = "data/network_traffic.csv",
+    data_path: str = RAW_DATA_PATH,
     model_dir: str = "models",
 ) -> dict[str, Any]:
-    """Train Random Forest and Isolation Forest models, evaluate, and save artifacts."""
+    """Train Random Forest and Isolation Forest models, evaluate, and save artifacts.
+
+    The raw CSV at ``data_path`` is cleaned with ``load_and_clean_data`` (which
+    also writes the cleaned copy to ``data/processed/``) before training.
+    """
     os.makedirs(model_dir, exist_ok=True)
 
-    if os.path.exists(data_path):
-        df = pd.read_csv(data_path)
-    else:
-        df = save_dataset(output_path=data_path, n_samples=6000)
+    if not os.path.exists(data_path):
+        save_dataset(output_path=data_path, n_samples=6000)
+    df = load_and_clean_data(
+        data_path, output_dir=PROCESSED_DATA_DIR, label_columns=LABEL_COLUMNS
+    )
 
     X = extract_features(df)
     y_binary = (df["Label"] == "Anomaly").to_numpy(dtype=int)
@@ -106,7 +139,7 @@ def train_and_save_models(
     )
 
     X_train, X_test, y_train, y_test, atk_train, atk_test = train_test_split(
-        X, y_binary, y_attack, test_size=0.25, random_state=42, stratify=y_binary
+        X, y_binary, y_attack, test_size=TEST_SIZE, random_state=SPLIT_RANDOM_STATE, stratify=y_binary
     )
 
     scaler = StandardScaler()

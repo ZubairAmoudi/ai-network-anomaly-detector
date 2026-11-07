@@ -211,7 +211,7 @@ def generate_network_traffic(
     return df
 
 
-def save_dataset(output_path: str = "data/network_traffic.csv", n_samples: int = 6000) -> pd.DataFrame:
+def save_dataset(output_path: str = "data/raw/network_traffic.csv", n_samples: int = 6000) -> pd.DataFrame:
     """Generate and persist synthetic NetFlow dataset to CSV."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df = generate_network_traffic(n_samples=n_samples, anomaly_ratio=0.18, seed=42)
@@ -220,7 +220,7 @@ def save_dataset(output_path: str = "data/network_traffic.csv", n_samples: int =
 
 
 if __name__ == "__main__":
-    output_file = os.path.join("data", "network_traffic.csv")
+    output_file = os.path.join("data", "raw", "network_traffic.csv")
     print(f"Generating synthetic NetFlow dataset -> {output_file} ...")
     dataset = save_dataset(output_path=output_file, n_samples=6000)
     counts = dataset["Label"].value_counts().to_dict()

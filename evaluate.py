@@ -8,12 +8,12 @@ def evaluate_anomaly_detector():
     print("=== Starting Anomaly Detection Model Evaluation ===")
     
     # Define data paths and trained model
-    data_path = "data/network_traffic.csv"
+    data_path = "data/processed/network_traffic_cleaned.csv"
     model_path = "models/isolation_forest_model.pkl"
     
     # Check if files exist
     if not os.path.exists(data_path):
-        print(f"[-] Error: Data file not found at path: {data_path}")
+        print(f"[-] Error: Data file not found at path: {data_path} (run model.py to generate it)")
         return
     if not os.path.exists(model_path):
         print(f"[-] Warning: Model not found at {model_path}, searching in models directory...")
@@ -27,6 +27,15 @@ def evaluate_anomaly_detector():
 
     # 2. Load data and model
     df = pd.read_csv(data_path)
+    # Score only the held-out test rows: rows used for training would inflate the metrics.
+    if "Label" in df.columns:
+        from model import holdout_indices
+        total_rows = len(df)
+        _, test_idx = holdout_indices(df)
+        df = df.iloc[test_idx].reset_index(drop=True)
+        print(f"[*] Evaluating on held-out test split: {len(df)} of {total_rows} rows.")
+    else:
+        print("[!] Warning: 'Label' column missing; cannot reproduce test split, evaluating on all rows.")
     loaded_data = joblib.load(model_path)
     scaler = None
 

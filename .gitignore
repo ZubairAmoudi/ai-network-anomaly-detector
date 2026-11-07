@@ -15,3 +15,6 @@ __pycache__/
 Thumbs.db
 .DS_Store
 
+# Generated data (rebuilt by the preprocessing pipeline during training)
+data/processed/
+
